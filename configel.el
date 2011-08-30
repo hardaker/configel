@@ -18,7 +18,7 @@
 ;;; Installation:
 ;;; Code:
 
-(defcustom configel-search-paths '("~/lib/elisp")
+(defcustom configel-search-paths '("~/lib/elisp/emacs")
   "A list of directories to search through for packages and init files to load"
   :type 'list
   :group 'configel)
@@ -56,6 +56,7 @@
   (let*
       ((item  (car attributes))
        (fullitem (concat configel-current-path "/" item))
+       (loadpath fullitem)
        (isdir (cadr attributes))
        (elfile (concat fullitem ".el"))
        (elcfile (concat elfile "c"))
@@ -66,12 +67,23 @@
 	       (not (equal item "."))
 	       (not (equal item ".."))
 	       )
-      (message "(load-path %s)" fullitem)
+      (message "loading and configuring package %s for you..." item)
+      ; if there is a lisp subdir, use that
+      (if (file-exists-p (concat fullitem "/lisp"))
+	  ;; XXX: this assumes it isn't a file
+	  (setq loadpath (concat fullitem "/lisp")))
+      ;; add the load path to our path list
+      (message "(add-to-list 'load-path %s)" loadpath)
+      ;; load our config first
       (if (file-exists-p elcfile)
 	  (message "(load-file %s)" elcfile)
 	(if (file-exists-p elfile)
 	    (message "(load-file %s)" elfile)))
-      (message "(require %s)" item))))
-	  
+      ;; then require the sub-package if we can
+      (if (or
+	   (file-exists-p (concat loadpath "/" item ".elc"))
+	   (file-exists-p (concat loadpath "/" item ".el")))
+	  (message "(require '%s)" item))))
 )
 
+(provide 'configel)
