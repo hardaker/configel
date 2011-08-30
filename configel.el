@@ -67,7 +67,7 @@
 (defun configel-load-everything ()
   "Loads all the packages it can find"
   (interactive)
-  (mapcar 'configel-load-path configel-search-paths)
+  (mapc 'configel-load-path configel-search-paths)
 )
 
 (defun configel-load-path (path)
@@ -75,7 +75,7 @@
   (interactive)
   (setq configel-current-path path)
   (let ((dirs (directory-files-and-attributes path)))
-    (mapcar 'configel-load-package dirs)
+    (mapc 'configel-load-package dirs)
     ))
 
 (defun configel-load-package (attributes)
