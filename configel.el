@@ -28,6 +28,11 @@
   :type 'boolean
   :group 'configel)
 
+(defcustom configel-auto-require t
+  "If t, attempt to 'require' a package of the same name as the dir found"
+  :type 'boolean
+  :group 'configel)
+
 (defvar configel-current-path nil)
 
 ;;
@@ -80,9 +85,10 @@
 	(if (file-exists-p elfile)
 	    (message "(load-file %s)" elfile)))
       ;; then require the sub-package if we can
-      (if (or
-	   (file-exists-p (concat loadpath "/" item ".elc"))
-	   (file-exists-p (concat loadpath "/" item ".el")))
+      (if (and configel-auto-require
+	       (or
+		(file-exists-p (concat loadpath "/" item ".elc"))
+		(file-exists-p (concat loadpath "/" item ".el"))))
 	  (message "(require '%s)" item))))
 )
 
