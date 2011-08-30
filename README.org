@@ -23,6 +23,30 @@
     (require 'configel)
     (configel-load-everything)
 
+*** Example Directory and Results
+
+    Lets say the directory in question contained the following items:
+
+       # cd ~/lib/elisp/emacs
+       # ls -1
+       org-mode.el
+       org-mode/
+       other-package/
+       magit/
+       magit.el
+
+    Then the (default) results would be:
+       ; first it will add org-mode/lisp to the load path
+       (load "org-mode.el")
+       (require 'org-mode)
+
+       ; first it will add magit to the load path
+       (load "magit.el")
+       (require 'magit)
+
+    Note that 'other-packgae' is ignored by default because it doesn't
+    contain a corresponding .el file.
+
 *** Adding new packages
 
   Lets say you have your lisp packages in ~/lib/elisp/emacs and you
