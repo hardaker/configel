@@ -28,6 +28,8 @@
   :type 'boolean
   :group 'configel)
 
+(defvar configel-current-path nil)
+
 ;;
 ;; functions to actually load everything
 ;;
@@ -37,17 +39,39 @@
 (defun configel-load-everything ()
   "Loads all the packages it can find"
   (interactive)
-  (mapcar 'configel-load-package configel-search-paths)
+  (mapcar 'configel-load-path configel-search-paths)
 )
 
 (defun configel-load-path (path)
   "Loads everything usable in a given path"
   (interactive)
-  (message (concat "loading: " path))
-)
+  (setq configel-current-path path)
+  (let ((dirs (directory-files-and-attributes path)))
+    (mapcar 'configel-load-package dirs)
+    ))
 
-(defun configel-load-package (path)
+(defun configel-load-package (attributes)
   "Load a singular package with a full path"
   (interactive)
-  (message (concat "loading: " path))
+  (let*
+      ((item  (car attributes))
+       (fullitem (concat configel-current-path "/" item))
+       (isdir (cadr attributes))
+       (elfile (concat fullitem ".el"))
+       (elcfile (concat elfile "c"))
+       (configexists (or (file-exists-p elfile) (file-exists-p elcfile)))
+       )
+    (when (and isdir
+	       (or configexists configel-load-every-package)
+	       (not (equal item "."))
+	       (not (equal item ".."))
+	       )
+      (message "(load-path %s)" fullitem)
+      (if (file-exists-p elcfile)
+	  (message "(load-file %s)" elcfile)
+	(if (file-exists-p elfile)
+	    (message "(load-file %s)" elfile)))
+      (message "(require %s)" item))))
+	  
 )
+
