@@ -95,24 +95,24 @@
 	       (not (equal item "."))
 	       (not (equal item ".."))
 	       )
-      (message "loading and configuring package %s for you..." item)
+      (message "Loading and configuring package %s for you..." item)
       ; if there is a lisp subdir, use that
       (if (file-exists-p (concat fullitem "/lisp"))
 	  ;; XXX: this assumes it isn't a file
 	  (setq loadpath (concat fullitem "/lisp")))
       ;; add the load path to our path list
-      (message "(add-to-list 'load-path %s)" loadpath)
+      (add-to-list 'load-path loadpath)
       ;; load our config first
       (if (file-exists-p elcfile)
-	  (message "(load-file %s)" elcfile)
+	  (load-file elcfile)
 	(if (file-exists-p elfile)
-	    (message "(load-file %s)" elfile)))
+	    (load-file elfile)))
       ;; then require the sub-package if we can
       (if (and configel-auto-require
 	       (or
 		(file-exists-p (concat loadpath "/" item ".elc"))
 		(file-exists-p (concat loadpath "/" item ".el"))))
-	  (message "(require '%s)" item))))
-)
+	  (require (intern item))))
+    ))
 
 (provide 'configel)
