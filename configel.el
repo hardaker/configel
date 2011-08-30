@@ -15,6 +15,29 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 ;;; Commentary:
+;; 
+;;  The purpose of the configel package is to auto-find and load other
+;;  packages that exist in a directory or set of directories.
+;; 
+;;  For example, the following configuration can be used to bootstap
+;;  everything else in a given set of directories:
+;; 
+;;    (setq configel-search-paths '("~/lib/elisp/emacs"))
+;;    (add-to-list 'load-path "~/src/configel")
+;;    (require 'configel)
+;;    (configel-load-everything)
+;;
+;;  By default *if there is a .el file too* above each sub-directory
+;;  found in the configel-search-paths list of directories, the package will:
+;;
+;;    - add each directory to the search path (or dir/lisp if it exists)
+;;    - load the .elc or .el file above the directory
+;;    - perform a (require 'name) if it could find one of:
+;;      - name/name.elc
+;;      - name/name.el
+;;      - name/lisp/name.elc
+;;      - name/lisp/name.el
+;;  
 ;;; Installation:
 ;;; Code:
 

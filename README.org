@@ -1,0 +1,66 @@
+.----------.
+| configel |
+`----------'
+
+* Purpose
+
+  The purpose of the configel package is to auto-find and load other
+  packages that exist in a directory or set of directories.
+
+  Is your .emacs (or equivalent) file too long?  Or if you're like me
+  you broke it into pieces but then have to load each of those, which
+  is still a management problem.  This package takes care of this for
+  you by allowing you to auto-load separate configuration files for
+  each package and then auto-loading the package itself.
+
+*** Example Usage
+ 
+  For example, the following configuration can be used to bootstap
+  everything else in a given set of directories:
+ 
+    (setq configel-search-paths '("~/lib/elisp/emacs"))
+    (add-to-list 'load-path "~/src/configel")
+    (require 'configel)
+    (configel-load-everything)
+
+*** Adding new packages
+
+  Lets say you have your lisp packages in ~/lib/elisp/emacs and you
+  just found out about [http://www.orgmode.org/ org-mode] and want to
+  check out the git repo and start playing with it.
+
+  # cd ~/lib/elisp/emacs/
+  # git clone git://orgmode.org/org-mode.git org-mode
+  # touch org-mode.el
+
+  Now you can store your personal config in the org-mode.el file and
+  the next time you start emacs /configel/ will find the directory,
+  load your (currently empty) org-mode.el file and then load the main
+  org-mode code set as well.  Done!
+
+* What it does internally
+
+  By default *if there is a .el file too* above each sub-directory
+  found in the configel-search-paths list of directories, the package will:
+
+    - add each directory to the search path (or dir/lisp if it exists)
+    - load the .elc or .el file above the directory
+    - perform a (require 'name) if it could find one of:
+      - name/name.elc
+      - name/name.el
+      - name/lisp/name.elc
+      - name/lisp/name.el
+
+* Configuration variables
+
+  + configel-search-paths:
+    A list of paths to search for directories
+
+  + configel-load-every-package:
+    If t (default is nil), it will load every directory found not just
+    ones with .el files above it.
+
+  + configel-auto-require:
+    If t (the default) it will try and perform a '(require ...)'
+    statement to load the package after loading the .el config file.
+
