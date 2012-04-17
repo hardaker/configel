@@ -67,8 +67,17 @@
 (defun configel-load-everything ()
   "Loads all the packages it can find"
   (interactive)
+  (mapc 'configel-add-path configel-search-paths)
   (mapc 'configel-load-path configel-search-paths)
 )
+
+(defun configel-add-path (path)
+  "Adds available packages in a path to the load-path"
+  (interactive)
+  (setq configel-current-path path)
+  (let ((dirs (directory-files-and-attributes path)))
+    (mapc 'configel-add-load-path dirs)
+    ))
 
 (defun configel-load-path (path)
   "Loads everything usable in a given path"
@@ -100,8 +109,6 @@
       (if (file-exists-p (concat fullitem "/lisp"))
 	  ;; XXX: this assumes it isn't a file
 	  (setq loadpath (concat fullitem "/lisp")))
-      ;; add the load path to our path list
-      (add-to-list 'load-path loadpath)
       ;; load our config first
       (if (file-exists-p elcfile)
 	  (load-file elcfile)
@@ -114,5 +121,31 @@
 		(file-exists-p (concat loadpath "/" item ".el"))))
 	  (require (intern item))))
     ))
+
+(defun configel-add-load-path (attributes)
+  "Add a package's path to the list of load-paths"
+  (interactive)
+  (let*
+      ((item  (car attributes))
+       (fullitem (concat configel-current-path "/" item))
+       (loadpath fullitem)
+       (isdir (cadr attributes))
+       (elfile (concat fullitem ".el"))
+       (elcfile (concat elfile "c"))
+       (configexists (or (file-exists-p elfile) (file-exists-p elcfile)))
+       )
+    (when (and isdir
+	       (or configexists configel-load-every-package)
+	       (not (equal item "."))
+	       (not (equal item ".."))
+	       )
+      (message "Adding %s package's lisp path for you..." item)
+      ; if there is a lisp subdir, use that
+      (if (file-exists-p (concat fullitem "/lisp"))
+	  ;; XXX: this assumes it isn't a file
+	  (setq loadpath (concat fullitem "/lisp")))
+      ;; add the load path to our path list
+      (add-to-list 'load-path loadpath)
+    )))
 
 (provide 'configel)
