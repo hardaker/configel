@@ -84,10 +84,16 @@
   (interactive)
   (setq configel-current-path path)
   (let ((dirs (directory-files-and-attributes path)))
-    (mapc 'configel-load-package dirs)
+    (mapc 'configel-load-package-init dirs)
     ))
 
-(defun configel-load-package (attributes)
+(defun configel-load-package (name)
+  "Loads a package name via it's init file, and auto-sets up the load path for it"
+  (interactive "s")
+  (configel-add-load-path (list name t))
+  (configel-load-package-init (list name t)))
+
+(defun configel-load-package-init (attributes)
   "Load a singular package with a full path"
   (interactive)
   (let*
